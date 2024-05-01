@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,9 +8,18 @@ namespace monogame_summative
     public class Game1 : Game
     {
 
-        Texture2D bowlgraf, sonicW, stairset, sonicwave, speech;
+        Texture2D bowlgraf, sonicW, stairset, sonicwave, speech, sonicflat, sonicollie;
+
+        Rectangle sonicflatRect, sonicollieRect;
+
+        Vector2 sonicollieSpeed;
 
         SpriteFont text;
+
+        SoundEffect edm;
+        SoundEffectInstance edmInstance;
+
+
 
         MouseState mouseState, prevMouseState;
 
@@ -38,6 +48,12 @@ namespace monogame_summative
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+            sonicflatRect = new Rectangle(680, 15, 150, 150);
+            sonicollieRect = new Rectangle(450, 10, 150, 150);
+
+            
+            sonicollieSpeed = new Vector2 (2, -1);
         }
 
         protected override void LoadContent()
@@ -48,7 +64,11 @@ namespace monogame_summative
             stairset = Content.Load<Texture2D>("stairset");
             sonicwave = Content.Load<Texture2D>("sonicwave");
             speech = Content.Load<Texture2D>("speech");
+            sonicflat = Content.Load<Texture2D>("sonicflat");
+            sonicollie = Content.Load<Texture2D>("sonicollie");
             text = Content.Load<SpriteFont>("File");
+            edm = Content.Load<SoundEffect>("edm");
+            edmInstance = edm.CreateInstance();
 
             // TODO: use this.Content to load your game content here
         }
@@ -61,6 +81,7 @@ namespace monogame_summative
             mouseState = Mouse.GetState();
             if (screen == Screen.Intro)
             {
+                edmInstance.Play();
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
                     screen = Screen.Animation;
             }
@@ -68,6 +89,11 @@ namespace monogame_summative
             {
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
                     screen = Screen.End;
+            }
+
+            if (edmInstance.State == SoundState.Stopped)
+            {
+                screen = Screen.Animation;
             }
 
             // TODO: Add your update logic here
@@ -84,13 +110,15 @@ namespace monogame_summative
                 _spriteBatch.Draw(bowlgraf, new Rectangle(0, 0, 800, 500), Color.White);
                 _spriteBatch.Draw(sonicwave, new Rectangle(375, 100, 200, 300), Color.White);
                 _spriteBatch.Draw(speech, new Rectangle (540, 80, 150, 100), Color.White);
-                _spriteBatch.DrawString(text, ("Hi Friends!"), new Vector2(570, 120), Color.Black);
-             
+                _spriteBatch.DrawString(text, ("Hi Friends! \nLeft click to continue!"), new Vector2(560, 110), Color.Black);
+
 
             }
             else if (screen == Screen.Animation)
             {
                 _spriteBatch.Draw(stairset, new Rectangle(0, 0, 800, 500), Color.White);
+                _spriteBatch.Draw(sonicflat, sonicflatRect, Color.White);
+                _spriteBatch.Draw(sonicollie, sonicollieRect, Color.White);
             }
             else if (screen == Screen.End)
             {
