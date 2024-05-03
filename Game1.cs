@@ -19,7 +19,7 @@ namespace monogame_summative
         SoundEffect edm;
         SoundEffectInstance edmInstance;
 
-
+        bool introPlayed;
 
         MouseState mouseState, prevMouseState;
 
@@ -50,10 +50,12 @@ namespace monogame_summative
             base.Initialize();
 
             sonicflatRect = new Rectangle(680, 15, 150, 150);
-            sonicollieRect = new Rectangle(450, 10, 150, 150);
+            sonicollieRect = new Rectangle(470, 10, 150, 150);
 
             
-            sonicollieSpeed = new Vector2 (2, -1);
+            sonicollieSpeed = new Vector2 (-2, -1);
+
+            introPlayed = false;
         }
 
         protected override void LoadContent()
@@ -79,22 +81,37 @@ namespace monogame_summative
                 Exit();
             prevMouseState = mouseState;
             mouseState = Mouse.GetState();
+
             if (screen == Screen.Intro)
             {
-                edmInstance.Play();
+                if (!introPlayed)
+                {
+                    edmInstance.Play();
+                    introPlayed = true;
+                }
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+                {
                     screen = Screen.Animation;
+                    edmInstance.Stop();
+                }
+                else if (edmInstance.State == SoundState.Stopped && introPlayed)
+                {
+                    screen = Screen.Animation;
+                }
+
             }
             else if (screen == Screen.Animation)
             {
+                Rectangle temp = sonicollieRect;
+                temp.X += (int)sonicollieSpeed.X;
+                temp.Y -= (int)sonicollieSpeed.Y;
+                sonicollieRect = temp;
+
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
                     screen = Screen.End;
             }
 
-            if (edmInstance.State == SoundState.Stopped)
-            {
-                screen = Screen.Animation;
-            }
+            
 
             // TODO: Add your update logic here
 
@@ -119,6 +136,10 @@ namespace monogame_summative
                 _spriteBatch.Draw(stairset, new Rectangle(0, 0, 800, 500), Color.White);
                 _spriteBatch.Draw(sonicflat, sonicflatRect, Color.White);
                 _spriteBatch.Draw(sonicollie, sonicollieRect, Color.White);
+                if (sonicollieRect.Location.X <= 100)
+                {
+
+                }
             }
             else if (screen == Screen.End)
             {
