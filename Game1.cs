@@ -12,12 +12,12 @@ namespace monogame_summative
 
         Rectangle sonicflatRect, sonicollieRect;
 
-        Vector2 sonicollieSpeed;
+        Vector2 sonicollieSpeed, sonicflatSpeed;
 
         SpriteFont text;
 
-        SoundEffect edm;
-        SoundEffectInstance edmInstance;
+        SoundEffect edm, ollie, skateroll;
+        SoundEffectInstance edmInstance, ollieInstance, skaterollInstence;
 
         bool introPlayed;
 
@@ -47,13 +47,18 @@ namespace monogame_summative
 
             // TODO: Add your initialization logic here
 
+            _graphics.PreferredBackBufferWidth = 800; 
+            _graphics.PreferredBackBufferHeight = 500; 
+            _graphics.ApplyChanges();
+
             base.Initialize();
 
             sonicflatRect = new Rectangle(680, 15, 150, 150);
-            sonicollieRect = new Rectangle(470, 10, 150, 150);
+            sonicollieRect = new Rectangle(600, 10, 150, 150);
 
             
-            sonicollieSpeed = new Vector2 (-2, -1);
+            sonicollieSpeed = new Vector2 (-2, 1);
+            sonicflatSpeed = new Vector2 (-2, 0);
 
             introPlayed = false;
         }
@@ -71,6 +76,10 @@ namespace monogame_summative
             text = Content.Load<SpriteFont>("File");
             edm = Content.Load<SoundEffect>("edm");
             edmInstance = edm.CreateInstance();
+            ollie = Content.Load<SoundEffect>("ollie");
+            ollieInstance = ollie.CreateInstance();
+            skateroll = Content.Load<SoundEffect>("skateroll");
+            skaterollInstence = skateroll.CreateInstance(); 
 
             // TODO: use this.Content to load your game content here
         }
@@ -102,10 +111,15 @@ namespace monogame_summative
             }
             else if (screen == Screen.Animation)
             {
-                Rectangle temp = sonicollieRect;
-                temp.X += (int)sonicollieSpeed.X;
-                temp.Y -= (int)sonicollieSpeed.Y;
-                sonicollieRect = temp;
+                Rectangle temp = sonicflatRect;
+                temp.X += (int)sonicflatSpeed.X;
+                temp.Y -= (int)sonicflatSpeed.Y;
+                sonicflatRect = temp;
+
+                Rectangle temp2 = sonicollieRect;
+                temp2.X += (int)sonicollieSpeed.X;
+                temp2.Y -= (int)sonicollieSpeed.Y;
+                sonicollieRect = temp2;
 
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
                     screen = Screen.End;
@@ -126,24 +140,44 @@ namespace monogame_summative
             {
                 _spriteBatch.Draw(bowlgraf, new Rectangle(0, 0, 800, 500), Color.White);
                 _spriteBatch.Draw(sonicwave, new Rectangle(375, 100, 200, 300), Color.White);
-                _spriteBatch.Draw(speech, new Rectangle (540, 80, 150, 100), Color.White);
+                _spriteBatch.Draw(speech, new Rectangle(540, 80, 150, 100), Color.White);
                 _spriteBatch.DrawString(text, ("Hi Friends! \nLeft click to continue!"), new Vector2(560, 110), Color.Black);
 
 
             }
             else if (screen == Screen.Animation)
             {
-                _spriteBatch.Draw(stairset, new Rectangle(0, 0, 800, 500), Color.White);
-                _spriteBatch.Draw(sonicflat, sonicflatRect, Color.White);
-                _spriteBatch.Draw(sonicollie, sonicollieRect, Color.White);
-                if (sonicollieRect.Location.X <= 100)
-                {
+                 _spriteBatch.Draw(stairset, new Rectangle(0, 0, 800, 500), Color.White);
+                 _spriteBatch.Draw(sonicflat, sonicflatRect, Color.White);
+                 skaterollInstence.Play();
 
-                }
+                 if (sonicflatRect.Location.X <= 600)
+                 {
+                     skaterollInstence.Stop();
+                     _spriteBatch.Draw(sonicollie, sonicollieRect, Color.White);
+                     sonicflatRect = new Rectangle(0, 0, 0, 0);
+                 }
+                 if (sonicollieRect.Location.X <= 500)
+                 {
+                     sonicollieSpeed = new Vector2(-3, -2);
+                 }
+                 if (sonicollieRect.Location.X <= 400)
+                 {
+                     ollieInstance.Play();
+                 }
+                 if (sonicollieRect.Location.X <= 10)
+                 {
+                     ollieInstance.Stop();
+                     sonicflatRect = new Rectangle(10, 300, 150, 150);
+                     sonicollieSpeed = new Vector2(0, 0);
+                     sonicollieRect = new Rectangle(0, 0, 0, 0);
+                     _spriteBatch.DrawString(text, ("Left click to go to the end screen."), new Vector2(450, 80), Color.Black);
+                 }
             }
             else if (screen == Screen.End)
             {
                 _spriteBatch.Draw(sonicW, new Vector2(120, 0), Color.White);
+                _spriteBatch.DrawString(text, ("Press esc to exit the program."), new Vector2(450, 80), Color.Black);
             }
             _spriteBatch.End();
 

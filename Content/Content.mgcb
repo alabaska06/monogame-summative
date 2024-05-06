@@ -38,6 +38,18 @@
 /processorParam:TextureFormat=Compressed
 /build:File.spritefont
 
+#begin ollie.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:ollie.wav
+
+#begin skateroll.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:skateroll.wav
+
 #begin sonicflat.png
 /importer:TextureImporter
 /processor:TextureProcessor
